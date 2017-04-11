@@ -47,7 +47,7 @@ func main() {
 	}
 
 	for {
-		// Make sure we can create the log directory
+	// Make sure we can create the log directory
 		if dirErr := os.MkdirAll(dir, 0755); dirErr != nil {
 			fmt.Println(dirErr.Error())
 			os.Exit(1)
