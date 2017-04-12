@@ -1,6 +1,6 @@
 # King Julien
 
-Nohup. But with flair.
+Nohup. But with a little extra.
 
 [![Build Status](https://travis-ci.org/kcmerrill/kj.svg?branch=master)](https://travis-ci.org/kcmerrill/kj) [![Join the chat at https://gitter.im/kcmerrill/kj](https://badges.gitter.im/kcmerrill/kj.svg)](https://gitter.im/kcmerrill/kj?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
