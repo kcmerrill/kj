@@ -13,7 +13,9 @@ Nohup. But with a little extra.
 via go:
 
 `$ go get -u github.com/kcmerrill/kj`
+## About
 
+I wanted something that would run in the background(use the `&`) sign, something that logged my application, something that would keep it alive in case it died for whatever reason, and also something that would keep X number of tasks running. 
 ## Usage
 
 The most basic usage is simply to run `kj your command here &`. Output will be stored to `kj-1.log`. 
