@@ -13,3 +13,11 @@ Nohup. But with flair.
 via go:
 
 `$ go get -u github.com/kcmerrill/kj`
+
+## Usage
+
+The most basic usage is simply to run `kj your command here &`. Output will be stored to `kj-1.log`. 
+
+More complex usage is to run kj with params.
+
+`kj --cmd="your command here" --id="name.you.want.to.use" --workers=10 --keep-alive`

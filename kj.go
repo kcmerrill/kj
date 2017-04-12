@@ -6,7 +6,9 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 )
 
@@ -16,6 +18,7 @@ var (
 	cmd       string
 	id        string
 	keepAlive bool
+	workers   int
 )
 
 func main() {
@@ -24,6 +27,7 @@ func main() {
 	flag.StringVar(&cmd, "cmd", "", "Command to run")
 	flag.StringVar(&id, "id", "kj", "Identifer of the command to run")
 	flag.BoolVar(&keepAlive, "keep-alive", false, "Should kj restart the process?")
+	flag.IntVar(&workers, "workers", 1, "How many workers we should spawn")
 	flag.Parse()
 
 	// channel to catch nohup
@@ -46,8 +50,20 @@ func main() {
 		os.Exit(1)
 	}
 
+	var wg sync.WaitGroup
+
+	for worker := 1; worker <= workers; worker++ {
+		wg.Add(1)
+		go Run(worker, dir, id, cmd)
+	}
+
+	wg.Wait()
+}
+
+// Run will run the command
+func Run(worker int, dir, id, cmd string) {
 	for {
-	// Make sure we can create the log directory
+		// Make sure we can create the log directory
 		if dirErr := os.MkdirAll(dir, 0755); dirErr != nil {
 			fmt.Println(dirErr.Error())
 			os.Exit(1)
@@ -57,7 +73,7 @@ func main() {
 		command := exec.Command("bash", "-c", cmd)
 
 		// open the out file for writing
-		output, _ := os.Create(dir + id + ".log")
+		output, _ := os.Create(dir + id + "-" + strconv.Itoa(worker) + ".log")
 		defer output.Close()
 
 		// capture stdin/stdout
@@ -72,6 +88,7 @@ func main() {
 		}
 		break
 	}
+
 }
 
 func catchSigs(sigs chan os.Signal) {
