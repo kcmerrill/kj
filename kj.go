@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 )
 
 var (
@@ -26,7 +27,7 @@ func main() {
 	flag.StringVar(&dir, "dir", "./", "Location to save log file")
 	flag.StringVar(&cmd, "cmd", "", "Command to run")
 	flag.StringVar(&id, "id", "kj", "Identifer of the command to run")
-	flag.BoolVar(&keepAlive, "keep-alive", false, "Should kj restart the process?")
+	flag.BoolVar(&keepAlive, "keep-alive", true, "Should kj restart the process?")
 	flag.IntVar(&workers, "workers", 1, "How many workers we should spawn")
 	flag.Parse()
 
@@ -37,7 +38,7 @@ func main() {
 	signal.Notify(sigs, syscall.SIGHUP)
 
 	// go catch the signals
-	go catchSigs(sigs)
+	go nohup(sigs)
 
 	// check defaults
 	if cmd == "" && len(os.Args) >= 2 {
@@ -54,7 +55,10 @@ func main() {
 
 	for worker := 1; worker <= workers; worker++ {
 		wg.Add(1)
-		go Run(worker, dir, id, cmd)
+		go func(worker int) {
+			Run(worker, dir, id, cmd)
+			wg.Done()
+		}(worker)
 	}
 
 	wg.Wait()
@@ -72,8 +76,12 @@ func Run(worker int, dir, id, cmd string) {
 		// execute the command
 		command := exec.Command("bash", "-c", cmd)
 
+		log := ""
+		if worker != 1 {
+			log = "-" + strconv.Itoa(worker)
+		}
 		// open the out file for writing
-		output, _ := os.Create(dir + id + "-" + strconv.Itoa(worker) + ".log")
+		output, _ := os.Create(dir + id + log + ".log")
 		defer output.Close()
 
 		// capture stdin/stdout
@@ -84,19 +92,11 @@ func Run(worker int, dir, id, cmd string) {
 
 		// if keepalive, run again
 		if keepAlive {
+			// sleep a second, lets not kill the system
+			<-time.After(1 * time.Second)
 			continue
 		}
 		break
 	}
 
-}
-
-func catchSigs(sigs chan os.Signal) {
-	for {
-		select {
-		// catch the hangup signal for as long as kj is running
-		case <-sigs:
-			continue
-		}
-	}
 }
