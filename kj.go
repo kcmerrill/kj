@@ -19,15 +19,18 @@ var (
 	cmd       string
 	id        string
 	keepAlive bool
+	bg        bool
 	workers   int
 )
 
 func main() {
+
 	flag.IntVar(&size, "size", 50, "Max size for log file")
 	flag.StringVar(&dir, "dir", "./", "Location to save log file")
 	flag.StringVar(&cmd, "cmd", "", "Command to run")
-	flag.StringVar(&id, "id", "kj", "Identifer of the command to run")
+	flag.StringVar(&id, "id", "", "Identifer of the command to run")
 	flag.BoolVar(&keepAlive, "keep-alive", true, "Should kj restart the process?")
+	flag.BoolVar(&bg, "bg", false, "Was kj started in background?")
 	flag.IntVar(&workers, "workers", 1, "How many workers we should spawn")
 	flag.Parse()
 
@@ -51,21 +54,33 @@ func main() {
 		os.Exit(1)
 	}
 
-	var wg sync.WaitGroup
+	// if id is empty ... lets set it to the command
+	if id == "" {
+		id = strings.Split(cmd, " ")[0]
+	} else {
+		id = "kj"
+	}
 
+	// should we pop it into the background?
+	if !bg {
+		exec.Command("kj", "--cmd", cmd, "--bg", "--size", size, "--dir", dir, "--id", id, "--keepalive", keepAlive, "--workers", workers).Start()
+		os.Exit(0)
+	}
+
+	// Run our commands ...
+	var wg sync.WaitGroup
 	for worker := 1; worker <= workers; worker++ {
 		wg.Add(1)
 		go func(worker int) {
-			Run(worker, dir, id, cmd)
+			Run(worker, dir, id, cmd, keepAlive)
 			wg.Done()
 		}(worker)
 	}
-
 	wg.Wait()
 }
 
 // Run will run the command
-func Run(worker int, dir, id, cmd string) {
+func Run(worker int, dir, id, cmd string, keepAlive bool) {
 	for {
 		// Make sure we can create the log directory
 		if dirErr := os.MkdirAll(dir, 0755); dirErr != nil {
@@ -76,12 +91,15 @@ func Run(worker int, dir, id, cmd string) {
 		// execute the command
 		command := exec.Command("bash", "-c", cmd)
 
+		// setup our logger
 		log := ""
 		if worker != 1 {
 			log = "-" + strconv.Itoa(worker)
 		}
+
 		// open the out file for writing
-		output, _ := os.Create(dir + id + log + ".log")
+		output, _ := os.OpenFile(dir+id+log+".log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0755)
+		fmt.Println(dir + id + log + ".log")
 		defer output.Close()
 
 		// capture stdin/stdout
@@ -98,5 +116,4 @@ func Run(worker int, dir, id, cmd string) {
 		}
 		break
 	}
-
 }
