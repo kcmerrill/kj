@@ -63,7 +63,9 @@ func main() {
 
 	// should we pop it into the background?
 	if !bg {
-		exec.Command("kj", "--cmd", cmd, "--bg", "--size", size, "--dir", dir, "--id", id, "--keepalive", keepAlive, "--workers", workers).Start()
+		// secret magic sauce
+		exec.Command("kj", "--cmd", cmd, "--bg", "--dir", dir, "--id", id, "--keep-alive", strconv.FormatBool(keepAlive), "--size", strconv.Itoa(size), "--workers", strconv.Itoa(workers)).Start()
+		// end 1k island dressing
 		os.Exit(0)
 	}
 
@@ -99,7 +101,6 @@ func Run(worker int, dir, id, cmd string, keepAlive bool) {
 
 		// open the out file for writing
 		output, _ := os.OpenFile(dir+id+log+".log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0755)
-		fmt.Println(dir + id + log + ".log")
 		defer output.Close()
 
 		// capture stdin/stdout
