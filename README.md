@@ -16,7 +16,11 @@ via go:
 
 ## About
 
-`kj` is a simple process manager that keeps a single(or multiple) workers working. The idea being, you can keep a process running while you're away at lunch. If you need something more complicated I'd recommend using `supervisord`. `kj` is small and lightweight and should be treated as such.
+`kj` is a simple process manager that keeps a single(or multiple) workers working. The idea being, you can keep a process running while you're away at lunch. If you need something more sophisticated I'd recommend using `supervisord`. `kj` is small and lightweight and should be treated as such.
+
+## Demo
+
+[![asciicast](https://asciinema.org/a/113063.png)](https://asciinema.org/a/113063)
 
 ## Usage
 
