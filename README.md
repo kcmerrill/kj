@@ -16,13 +16,13 @@ via go:
 
 ## About
 
+`kj` is a simple process manager that keeps a single(or multiple) workers working. The idea being, you can keep a process running while you're away at lunch. If you need something more sophisticated I'd recommend using `supervisord`. `kj` is small and lightweight and should be treated as such.
+
 * keep a process running
 * keep X number of processes running
 * automatically shove processes to the background
 * keep logs of stdin/stdout
 * log reaping based on log size(coming soon)
-
-`kj` is a simple process manager that keeps a single(or multiple) workers working. The idea being, you can keep a process running while you're away at lunch. If you need something more sophisticated I'd recommend using `supervisord`. `kj` is small and lightweight and should be treated as such.
 
 ## Demo
 
