@@ -13,13 +13,16 @@ Nohup. But with a little extra.
 via go:
 
 `$ go get -u github.com/kcmerrill/kj`
+
 ## About
 
-I wanted something that would run in the background(use the `&`) sign, something that logged my application, something that would keep it alive in case it died for whatever reason, and also something that would keep X number of tasks running. 
+`kj` is a simple process manager that keeps a single(or multiple) workers working. The idea being, you can keep a process running while you're away at lunch. If you need something more complicated I'd recommend using `supervisord`. `kj` is small and lightweight and should be treated as such.
+
 ## Usage
 
-The most basic usage is simply to run `kj your command here &`. Output will be stored to `kj-1.log`. 
+The most basic usage is simply to run `kj echo hello world` where `echo hello world` is the command you want to run. It will spawn the process off in the background, and make sure it can't be interrupted by the hangup signal.
 
-More complex usage is to run kj with params.
 
-`kj --cmd="your command here" --id="name.you.want.to.use" --workers=10 --keep-alive`
+`kj --cmd="your command here" --id="name.you.want.to.use" --workers=10 --run-once`
+
+The above example will store your logs in a file called `name.you.want.to.use-_worker-id_.log`. By default, `kj` will attempt to keep your process running by restarting it. 
