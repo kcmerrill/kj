@@ -34,4 +34,4 @@ The most basic usage is simply to run `kj echo hello world` where `echo hello wo
 
 `kj --cmd="your command here" --id="name.you.want.to.use" --workers=10 --run-once`
 
-The above example will store your logs in a file called `name.you.want.to.use-_worker-id_.log`. By default, `kj` will attempt to keep your process running by restarting it.
+The above example will store your logs in a file called `name.you.want.to.use-_worker-id_.log`. By default, `kj` will attempt to keep your process running by restarting it. `--run-once` flag will only let the process run once and then kj will exit out.
