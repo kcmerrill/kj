@@ -9,23 +9,18 @@ import (
 	"time"
 )
 
-func run(cmd string, timeout bool) {
+func runHelloWorld() {
 	os.Chdir("/tmp")
-	command := exec.Command(cmd)
+	command := exec.Command("kj", "echo", "hello", "world")
+	command.Stdout = os.Stdout
 	command.Start()
-	if timeout {
-		<-time.After(4 * time.Second)
-		command.Process.Kill()
-	} else {
-		command.Wait()
-	}
 	// give it a second to spawn the process ...
-	<-time.After(1 * time.Second)
+	<-time.After(4 * time.Second)
 }
 
 func TestKJBasic(t *testing.T) {
 	// first lets test the basics
-	run("echo hello world", false)
+	runHelloWorld()
 	// should cause 3 hello worlds to show up
 	_, err := os.Stat("/tmp/echo.log")
 	if err != nil {
