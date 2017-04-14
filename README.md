@@ -22,7 +22,7 @@ via go:
 * keep X number of processes running
 * automatically shove processes to the background
 * keep logs of stdin/stdout
-* log reaping based on log size(coming soon)
+* log reaping based on log size
 
 ## Demo
 

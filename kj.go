@@ -25,7 +25,7 @@ var (
 
 func main() {
 
-	flag.IntVar(&size, "size", 50, "Max size for log file")
+	flag.IntVar(&size, "size", 5, "Max size in MB for log file")
 	flag.StringVar(&dir, "dir", "./", "Location to save log file")
 	flag.StringVar(&cmd, "cmd", "", "Command to run")
 	flag.StringVar(&id, "id", "", "Identifer of the command to run")
@@ -76,16 +76,26 @@ func main() {
 	var wg sync.WaitGroup
 	for worker := 1; worker <= workers; worker++ {
 		wg.Add(1)
-		go func(worker int) {
-			Run(worker, dir, id, cmd, runOnce)
+		go func(worker, size int) {
+			Run(worker, dir, id, cmd, runOnce, size)
 			wg.Done()
-		}(worker)
+		}(worker, size)
 	}
 	wg.Wait()
 }
 
 // Run will run the command
-func Run(worker int, dir, id, cmd string, keepAlive bool) {
+func Run(worker int, dir, id, cmd string, keepAlive bool, size int) {
+	// setup our logger
+	log := ""
+	if worker != 1 {
+		log = "-" + strconv.Itoa(worker)
+	}
+	outFile := dir + id + log + ".log"
+	// go clean up after ourselves
+	go Janitor(outFile, size)
+
+	// giddy up!
 	for {
 		// Make sure we can create the log directory
 		if dirErr := os.MkdirAll(dir, 0755); dirErr != nil {
@@ -96,14 +106,8 @@ func Run(worker int, dir, id, cmd string, keepAlive bool) {
 		// execute the command
 		command := exec.Command("bash", "-c", cmd)
 
-		// setup our logger
-		log := ""
-		if worker != 1 {
-			log = "-" + strconv.Itoa(worker)
-		}
-
 		// open the out file for writing
-		output, _ := os.OpenFile(dir+id+log+".log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0755)
+		output, _ := os.OpenFile(outFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0755)
 		defer output.Close()
 
 		// capture stdin/stdout
@@ -135,5 +139,19 @@ func nohup(sigs chan os.Signal) {
 		case <-sigs:
 			continue
 		}
+	}
+}
+
+// Janitor will watch a file and make sure it doesn't go over the specified size
+func Janitor(file string, size int) {
+	for {
+		info, err := os.Stat(file)
+		if err == nil {
+			if int64(size) <= int64(float64(0.000001)*float64(info.Size())) {
+				// we should do something about the file size!
+				os.Truncate(file, 0)
+			}
+		}
+		<-time.After(1 * time.Second)
 	}
 }
