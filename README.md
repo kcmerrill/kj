@@ -16,7 +16,7 @@ via go:
 
 ## About
 
-`kj` is a simple process manager that keeps a single(or multiple) workers working. The idea being, you can keep a process running while you're away at lunch. If you need something more sophisticated I'd recommend using `supervisord`. `kj` is small and lightweight and should be treated as such.
+`kj` is a simple process manager that keeps a single(or multiple) processes working. The idea being, you can keep a process running while you're away at lunch. If you need something more sophisticated I'd recommend using `supervisord`. `kj` is small and lightweight and should be treated as such.
 
 * keep a process running
 * keep X number of processes running
@@ -32,6 +32,6 @@ via go:
 
 The most basic usage is simply to run `kj echo hello world` where `echo hello world` is the command you want to run. It will spawn the process off in the background, and make sure it can't be interrupted by the hangup signal.
 
-`kj --cmd="your command here" --id="name.you.want.to.use" --workers=10 --run-once`
+`kj --cmd="your command here" --id="name.of.log.file.essentially" --workers=10 --run-once`
 
-The above example will store your logs in a file called `name.you.want.to.use-_worker-id_.log`. By default, `kj` will attempt to keep your process running by restarting it. `--run-once` flag will only let the process run once and then kj will exit out.
+The above example will store your logs in a file called `name.of.log.file.essentially`. By default, `kj` will attempt to keep your process running by restarting it. `--run-once` flag will only let the process run once and then kj will exit out when the process completes.
