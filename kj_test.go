@@ -14,9 +14,8 @@ func runHelloWorld() {
 	command := exec.Command("kj", "echo", "hello", "world")
 	command.Stdout = os.Stdout
 	command.Start()
-	command.Wait()
 	// give it a second to spawn the process ...
-	<-time.After(1 * time.Second)
+	<-time.After(4 * time.Second)
 }
 
 func TestKJBasic(t *testing.T) {
