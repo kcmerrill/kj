@@ -27,7 +27,6 @@ func main() {
 
 	flag.IntVar(&size, "size", 5, "Max size in MB for log file")
 	flag.StringVar(&dir, "dir", "./", "Location to save log file")
-	flag.StringVar(&cmd, "cmd", "", "Command to run")
 	flag.StringVar(&id, "id", "", "Identifer of the command to run")
 	flag.BoolVar(&runOnce, "run-once", false, "Should kj restart the process if it dies?")
 	flag.BoolVar(&bg, "bg", false, "Was kj started in background?")
@@ -44,8 +43,8 @@ func main() {
 	go nohup(sigs)
 
 	// check defaults
-	if cmd == "" && len(os.Args) >= 2 {
-		cmd = strings.Join(os.Args[1:], " ")
+	if len(flag.Args()) >= 1 && len(os.Args) >= 2 {
+		cmd = strings.Join(flag.Args(), " ")
 	}
 
 	// check for a valid command
@@ -64,9 +63,9 @@ func main() {
 		// we can just hijack the command to add our strings here
 		// secret magic sauce
 		if runOnce {
-			exec.Command("kj", "--cmd", cmd, "--bg", "--run-once", "--dir", dir, "--id", id, "--size", strconv.Itoa(size), "--workers", strconv.Itoa(workers)).Start()
+			exec.Command("kj", "--bg", "--run-once", "--dir", dir, "--id", id, "--size", strconv.Itoa(size), "--workers", strconv.Itoa(workers), cmd).Start()
 		} else {
-			exec.Command("kj", "--cmd", cmd, "--bg", "--dir", dir, "--id", id, "--size", strconv.Itoa(size), "--workers", strconv.Itoa(workers)).Start()
+			exec.Command("kj", "--bg", "--dir", dir, "--id", id, "--size", strconv.Itoa(size), "--workers", strconv.Itoa(workers), cmd).Start()
 		}
 		// end 1k island dressing
 		os.Exit(0)

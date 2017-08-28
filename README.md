@@ -22,16 +22,16 @@ via go:
 * keep X number of processes running
 * automatically shove processes to the background
 * keep logs of stdin/stdout
-* log reaping based on log size
+* log reaping based on log sizde
 
-## Demo
+# Demo
 
-[![asciicast](https://asciinema.org/a/113063.png)](https://asciinema.org/a/113063)
+[![asciicast](https://asciinema.org/a/135248.png)](https://asciinema.org/a/135248)
 
 ## Usage
 
 The most basic usage is simply to run `kj echo hello world` where `echo hello world` is the command you want to run. It will spawn the process off in the background, and make sure it can't be interrupted by the hangup signal.
 
-`kj --cmd="your command here" --id="name.of.log.file.essentially" --workers=10 --run-once`
+`kj --id="name.of.log.file.essentially" --workers=10 --run-once <your_command_here>`
 
 The above example will store your logs in a file called `name.of.log.file.essentially`. By default, `kj` will attempt to keep your process running by restarting it. `--run-once` flag will only let the process run once and then kj will exit out when the process completes.
